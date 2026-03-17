@@ -1,0 +1,38 @@
+services:
+  # Backend Service (Laravel)
+  api:
+    build:
+      context: ./api
+      dockerfile: ../docker/backend.dockerfile
+    container_name: leave-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api:/var/www/html
+    depends_on:
+      - db
+    networks:
+      - leave-network
+
+  # Database Service (PostgreSQL)
+  db:
+    image: postgres:15-alpine
+    container_name: leave-db
+    restart: always
+    environment:
+      POSTGRES_DB: leave_mgmt_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secretpassword
+    ports:
+      - "5433:5432" # Host 5433 agar tidak bentrok dengan Postgres lokal jika ada
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - leave-network
+
+networks:
+  leave-network:
+    driver: bridge
+
+volumes:
+  pgdata:
